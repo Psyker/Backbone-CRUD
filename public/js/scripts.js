@@ -4,13 +4,15 @@ var Book = Backbone.Model.extend({
   defaults : {
     author: "",
     title: "",
-    release: 00-00-0000
+    release: 0000
   }
 })
 
 // Backbone Collection
 
-var Books = Backbone.Collection.extend({})
+var Books = Backbone.Collection.extend({
+  url: 'http://localhost:3000/api/books'
+})
 
 // Instanciate Books
 
@@ -73,6 +75,17 @@ var BooksView = Backbone.View.extend({
           }, 100)
       }, this)
       this.model.on('remove', this.render, this);
+
+      this.model.fetch({
+        success: function(response) {
+          _.each(response.toJSON(), function(item) {
+            console.log('Book _id: ' + item._id)
+          });
+        },
+        error: function() {
+          console.log('Book not found')
+        }
+      });
     },
     render: function() {
       var self = this;
@@ -96,6 +109,15 @@ var booksView = new BooksView();
     $('.form-control').val('')
     console.log(book.toJSON());
     books.add(book);
+
+    book.save(null, {
+      success: function(response) {
+        console.log('The Book has been SAVED with the _id: '+ response.toJSON()._id)
+      },
+      error: function() {
+        console.log('Fail to save the book.')
+      }
+    });
   });
 
 })();
